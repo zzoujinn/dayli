@@ -40,22 +40,32 @@ def register_exist(request):
     return JsonResponse({'count':count})
 
 
-
 def login(request):
     return render(request, 'df_user/login.html')
 
 
 def login_handle(request):
+    context={'error_name': 0, 'error_passwd': 0, 'uname':'', 'upwd':'' }
     post = request.POST
     uname = post.get('username')
     upwd = post.get('pwd')
-    s1 = sha1()
-    s1.update(upwd)
-    upwdsha = s1.hexdigest()
+    # 查询用户信息
     userinfo = UserInfo.objects.filter(uname=uname)
-    realpass = userinfo[0].upwd
-    if upwdsha == realpass:
-        return HttpResponseRedirect('/user/info')
+    if len(userinfo)==1:#用户名是否存在
+        s1 = sha1()
+        s1.update(upwd)
+        upwdsha = s1.hexdigest()
+        realpass = userinfo[0].upwd
+        red = HttpResponseRedirect('/user/info')
+        if upwdsha == realpass:
+            return red
+        else:
+            print ('---------------------------------->' )
+            context = {'error_name': 0, 'error_passwd': 1, 'uname': uname, 'upwd': upwd}
+            return render(request, 'df_user/login.html', context)
+    else:
+        context = {'error_name': 1, 'error_passwd': 0, 'uname': uname, 'upwd': upwd}
+        return render(request, 'df_user/login.html', context)
 
 
 def user_center_info(request):
