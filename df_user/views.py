@@ -58,9 +58,10 @@ def login_handle(request):
         realpass = userinfo[0].upwd
         red = HttpResponseRedirect('/user/info')
         if upwdsha == realpass:#密码验证
+            request.session['user_id']=userinfo[0].id
+            request.session['user_name'] = userinfo[0].uname
             return red
         else:
-            print ('---------------------------------->' )
             context = {'error_name': 0, 'error_passwd': 1, 'uname': uname, 'upwd': upwd}
             return render(request, 'df_user/login.html', context)
     else:
@@ -69,7 +70,26 @@ def login_handle(request):
 
 
 def user_center_info(request):
-    return render(request, 'df_user/user_center_info.html')
+    user_email=UserInfo.objects.get(id=request.session['user_id']).uemail
+    context={'title': '用户中心',
+             'user_email': user_email,
+             'user_name': request.session['user_name']}
+    return render(request, 'df_user/user_center_info.html',context)
+
+
+def user_center_order(request):
+    return render(request,'df_user/user_center_order.html')
+
+
+def user_center_site(request):
+    user_info=UserInfo.objects.get(id=request.session['user_id'])
+    ushou=user_info.ushou
+    uaddress=user_info.uaddress
+    uyoubian=user_info.uyoubian
+    uphone=user_info.uphone
+    context={'ushou': ushou, 'uaddress': uaddress, 'uyoubian':uyoubian, 'uphone':uphone }
+    print ('------------>',context)
+    return render(request,'df_user/user_center_site.html',context)
 
 
 
