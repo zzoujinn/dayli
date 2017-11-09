@@ -57,7 +57,7 @@ def login_handle(request):
         upwdsha = s1.hexdigest()
         realpass = userinfo[0].upwd
         red = HttpResponseRedirect('/user/info')
-        if upwdsha == realpass:
+        if upwdsha == realpass:#密码验证
             return red
         else:
             print ('---------------------------------->' )
