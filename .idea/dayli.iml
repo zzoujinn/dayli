@@ -4,6 +4,8 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="jdk" jdkName="Python 2.7.12 virtualenv at ~/Envs/h4" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="import_game_info" />
+    <orderEntry type="module" module-name="import_info" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_FOLDERS">

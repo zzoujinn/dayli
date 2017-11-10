@@ -82,14 +82,33 @@ def user_center_order(request):
 
 
 def user_center_site(request):
+    # 收货地址的默认显示效果
     user_info=UserInfo.objects.get(id=request.session['user_id'])
     ushou=user_info.ushou
     uaddress=user_info.uaddress
     uyoubian=user_info.uyoubian
     uphone=user_info.uphone
-    context={'ushou': ushou, 'uaddress': uaddress, 'uyoubian':uyoubian, 'uphone':uphone }
-    print ('------------>',context)
+    context={'ushou': ushou, 'uaddress': uaddress, 'uyoubian':uyoubian, 'uphone':uphone ,'uname': request.session['user_name']}
+    print ('----->',context)
     return render(request,'df_user/user_center_site.html',context)
+
+
+def user_center_site_handle(request):
+    # 用户修改收货地址
+    post = request.POST
+    ushou = post.get('ushou')
+    uphone = post.get('uphone')
+    uyoubian = post.get('uyoubian')
+    uaddress = post.get('uaddress')
+    user = UserInfo.objects.get(id=request.session['user_id'])
+    user.ushou = ushou
+    user.uphone = uphone
+    user.uyoubian = uyoubian
+    user.uaddress = uaddress
+    user.save()
+    return redirect('/user/site/')
+
+
 
 
 
