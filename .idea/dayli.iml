@@ -6,6 +6,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="import_game_info" />
     <orderEntry type="module" module-name="import_info" />
+    <orderEntry type="module" module-name="tornado" />
   </component>
   <component name="TemplatesService">
     <option name="TEMPLATE_FOLDERS">

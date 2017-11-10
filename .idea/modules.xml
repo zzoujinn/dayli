@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/dayli.iml" filepath="$PROJECT_DIR$/.idea/dayli.iml" />
       <module fileurl="file://$PROJECT_DIR$/../import_game_info/.idea/import_game_info.iml" filepath="$PROJECT_DIR$/../import_game_info/.idea/import_game_info.iml" />
       <module fileurl="file://$USER_HOME$/project/import_info/.idea/import_info.iml" filepath="$USER_HOME$/project/import_info/.idea/import_info.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../tornado/.idea/tornado.iml" filepath="$PROJECT_DIR$/../tornado/.idea/tornado.iml" />
     </modules>
   </component>
 </project>
