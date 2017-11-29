@@ -5,6 +5,7 @@ from django.shortcuts import render,redirect
 from hashlib import sha1
 from django.http import JsonResponse,HttpResponseRedirect
 import user_decoration
+from df_goods.models import *
 # Create your views here.
 
 
@@ -58,7 +59,7 @@ def login_handle(request):
         s1.update(upwd)
         upwdsha = s1.hexdigest()
         realpass = userinfo[0].upwd
-        red = HttpResponseRedirect(request.COOKIRS.get('url','/'))
+        red = HttpResponseRedirect(request.COOKIES.get('url','/'))
         if jizhu != 0:
             red.set_cookie('uname',uname)
         else:
@@ -81,7 +82,17 @@ def user_center_info(request):
     user_email=UserInfo.objects.get(id=request.session['user_id']).uemail
     user_address=UserInfo.objects.get(id=request.session['user_id']).uaddress
     print user_address
+    goods_ids = request.COOKIES.get('goods_ids','')
+    goods_ids1 = goods_ids.split(',')
+    if len(goods_ids1) == 0: # 新账号没有记录,会报错,默认显示前5天.后续改为最新5条
+        goods_ids1==[1,2,3,4,5]
+
+    goods_list = []
+    print ('goods_ids1---------------->',goods_ids1)
+    for goods_id in goods_ids1:
+        goods_list.append(GoodInfo.objects.get(id=int(goods_id)))
     context={'title': '用户中心',
+             'goods_list': goods_list,
              'user_email': user_email,
              'user_address':user_address,
              'user_name': request.session['user_name']}
@@ -119,6 +130,11 @@ def user_center_site_handle(request):
     user.uaddress = uaddress
     user.save()
     return redirect('/user/site/')
+
+
+def logout(request):
+    request.session.flush()
+    return  redirect('/goods/index')
 
 
 

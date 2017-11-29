@@ -38,7 +38,24 @@ def detail(request,id):
     news = goods.gtype.goodinfo_set.order_by('-id')[0:2]
     context = {"id":id, "goods":goods, "title":"商品详情", "news":news}
     print goods.id
-    return render(request, 'df_goods/detail.html',context)
+    response = render(request, 'df_goods/detail.html', context)
+
+    # 最近浏览的5条商品
+    goods_ids = request.COOKIES.get('goods_ids','')
+    goods_id = '%d'%goods.id
+    if goods_ids != '': #有记录,删除重新添加这条
+        goods_ids1 = goods_ids.split(',')
+        if goods_ids1.count(goods_id)>=1:
+             goods_ids.remove(goods_id)
+        goods_ids1.insert(0,goods_id)
+        if len(goods_ids1)>=6:
+            del goods_ids1[5]
+        goods_ids= ','.join(goods_ids1)
+    else:
+        goods_ids = goods_id
+    response.set_cookie('goods_ids',goods_ids)
+
+    return response
 
 
 def list(request, tid, pindex, sort):  # typeid,当前第几页,排序依据
