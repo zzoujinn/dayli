@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^order/', views.user_center_order),
     url(r'^site/', views.user_center_site),
     url(r'^site_handle/', views.user_center_site_handle),
+    url(r'^register_exist/', views.register_exist),
 ]

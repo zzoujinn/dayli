@@ -4,6 +4,7 @@ from models import *
 from django.shortcuts import render,redirect
 from hashlib import sha1
 from django.http import JsonResponse,HttpResponseRedirect
+import user_decoration
 # Create your views here.
 
 
@@ -49,6 +50,7 @@ def login_handle(request):
     post = request.POST
     uname = post.get('username')
     upwd = post.get('pwd')
+    jizhu = post.get('jizhu')
     # 查询用户信息
     userinfo = UserInfo.objects.filter(uname=uname)
     if len(userinfo)==1:#用户名是否存在
@@ -56,7 +58,12 @@ def login_handle(request):
         s1.update(upwd)
         upwdsha = s1.hexdigest()
         realpass = userinfo[0].upwd
-        red = HttpResponseRedirect('/user/info')
+        red = HttpResponseRedirect(request.COOKIRS.get('url','/'))
+        if jizhu != 0:
+            red.set_cookie('uname',uname)
+        else:
+            red.set_cookie('uname','',max_age=-1)
+
         if upwdsha == realpass:#密码验证
             request.session['user_id']=userinfo[0].id
             request.session['user_name'] = userinfo[0].uname
@@ -69,14 +76,19 @@ def login_handle(request):
         return render(request, 'df_user/login.html', context)
 
 
+@user_decoration.login
 def user_center_info(request):
     user_email=UserInfo.objects.get(id=request.session['user_id']).uemail
+    user_address=UserInfo.objects.get(id=request.session['user_id']).uaddress
+    print user_address
     context={'title': '用户中心',
              'user_email': user_email,
+             'user_address':user_address,
              'user_name': request.session['user_name']}
     return render(request, 'df_user/user_center_info.html',context)
 
 
+@user_decoration.login
 def user_center_order(request):
     return render(request,'df_user/user_center_order.html')
 
