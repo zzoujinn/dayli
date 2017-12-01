@@ -1,0 +1,170 @@
+{%extends 'userinfo_foot.html'%}
+
+{% block body %}
+<script>
+	function total() {
+		total1 = 0;
+		total_count = 0;
+		$('.col07').each(function () {
+			//获取数量
+			count=$(this).prev().find('input').val();
+			//获取单价
+			price=$(this).prev().prev().find('span').text();
+			//计算小计
+			total0=parseFloat(count)*parseFloat(price);
+			$(this).text(total0.toFixed(2));
+			if (($(this).parent().find('li:eq(0) input').prop('checked'))){ //判断是否选择
+				total1+=total0;
+				total_count++;
+			}
+		});
+		//显示总计
+		$('#total').text(total1.toFixed(2));
+		$('.total_count1').text(total_count)
+		$('#quanbu').text(total_count)
+	}
+
+	//修改数据库相关信息
+	function updatabase() {
+		$.get('/cart/edit'+cart_id+'_'+curnum+'/',(function (data) {
+			if (data.ok==0){
+				total();
+			}
+			else {
+				$(this).val('1');
+			}
+		}))
+    }
+	//删除数据
+	function cart_delete() {
+		def = confirm('确定要删除这条信息吗?')
+		alert(cart_id)
+		if (def){
+		    $.get('/cart/delete'+cart_id, function (date) {
+				if (date.ok==0){
+				    $('ul').remove('#'+cart_id)
+				}
+            })
+		}
+    }
+
+	$(function() {
+	    //先计算一次总额
+	    total()
+		//全选全消
+		$('#checkall').click(function () {
+			state = $(this).prop('checked');
+			$(':checkbox:not(#checkall)').prop('checked',state);
+			total()
+        })
+		//选择
+		$(':checkbox:not(#checkall)').click(function () {
+			if($(this).prop('checked')){
+			    // :checked 表示找到所有被选中的checkedbox,这里的功能为如果选择后,所有的都被选择了,就设置全选
+			    if($(':checked').length+1==$(':checkbox').length){
+			        $('#checkall').prop('checked',true);
+				}
+			}
+			else{
+			    // 同上,全选取消
+				if($(':checked').length-1==0){
+			        $('#checkall').prop('checked',false);
+				}
+			}
+			total()
+        })
+	    //点击+- 显示相对应的价格和数量,其实不用在这里计算总价直接调用total就行
+		$('.minus').click(function () {
+			num = parseFloat($(this).prev('input').val()); //取点击的标签旁的input框
+			curnum =num-1
+			if (curnum<=0){
+			    alert('请输入正确的值')
+			}
+			else{
+			    $(this).prev('input').val(curnum);
+			    cart_id = $(this).parents('.cart_list_td').attr('id');
+				price = parseFloat($(this).parent().parent().parent().find('li:eq(4) span').text()) //取单价
+				curnum =num-1
+				xiaoji = (curnum * price).toFixed(2)//保留2位小数
+				$(this).parent().parent().parent().find('li:eq(6) span').text(xiaoji)
+				updatabase()
+			}
+    	});
+		$('.add').click(function () {
+			num = parseFloat($(this).next('input').val()); //取点击的标签旁的input框
+			cart_id = $(this).parents('.cart_list_td').attr('id');
+			$(this).next('input').val(num+1);
+			price = parseFloat($(this).parent().parent().parent().find('li:eq(4) span').text()) //取单价
+			curnum =num+1
+			xiaoji = (curnum * price).toFixed(2)//保留2位小数
+			$(this).parent().parent().parent().find('li:eq(6) span').text(xiaoji)
+			//修改数据库相关信息
+			updatabase()
+    	});
+		// 手动输入shuliang xiangguan xianshi
+		$('.num_show').blur(function () {
+		    curnum = $(this).val();
+			cart_id = $(this).parents('.cart_list_td').attr('id');
+			if (curnum<=0){
+			    alert('请输入正确的值')
+			}
+			updatabase()
+		});
+		// delete
+		$('#delete').click(function () {
+			cart_id = $(this).parents('.cart_list_td').attr('id');
+			alert(cart_id)
+			cart_delete(cart_id)
+        });
+
+
+
+    })
+</script>
+
+	<div class="search_bar clearfix">
+		<a href="../df_goods/index.html" class="logo fl"><img src="/static/images/logo.png"></a>
+		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;购物车</div>
+		<div class="search_con fr">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+		</div>		
+	</div>
+
+	<div class="total_count">全部商品<em id="quanbu">2</em>件</div>
+	<ul class="cart_list_th clearfix">
+		<li class="col01">商品名称</li>
+		<li class="col02">商品单位</li>
+		<li class="col03">商品价格</li>
+		<li class="col04">数量</li>
+		<li class="col05">小计</li>
+		<li class="col06">操作</li>
+	</ul>
+{%for cartinfo in goods%}
+	<ul class="cart_list_td clearfix" id="{{cartinfo.cartinfo__id}}">
+		<li class="col01"><input type="checkbox" name="" checked></li>
+		<li class="col02"><img src="/static/{{cartinfo.gpic}}"></li>
+		<li class="col03">{{cartinfo.gtitle}}<br><em>{{cartinfo.gprice}}元/{{cartinfo.gunit}}</em></li>
+		<li class="col04">{{cartinfo.gunit}}</li>
+		<li class="col05"><span>{{cartinfo.gprice}}</span>元</li>
+		<li class="col06">
+			<div class="num_add">
+				<a href="javascript:;" class="add fl">+</a>
+				<input type="text" class="num_show fl" value="{{cartinfo.cartinfo__count}}">
+				<a href="javascript:;" class="minus fl">-</a>
+			</div>
+		</li>
+		<li class="col07"><span>{{cartinfo.gprice}}</span>元</li>
+		<li class="col08"><a href="javascript:;" id="delete">删除</a></li>
+	</ul>
+{%endfor%}
+
+	
+
+	<ul class="settlements">
+		<li class="col01"><input type="checkbox" name="" checked="" id="checkall"></li>
+		<li class="col02">全选</li>
+		<li class="col03">合计(不含运费)：<span>¥</span><em id="total">42.60</em><br>共计<b class="total_count1">2</b>件商品</li>
+		<li class="col04"><a href="../df_user/place_order.html">去结算</a></li>
+	</ul>
+{%endblock%}
