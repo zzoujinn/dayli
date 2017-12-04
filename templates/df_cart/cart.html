@@ -2,6 +2,7 @@
 
 {% block body %}
 <script>
+	//总计
 	function total() {
 		total1 = 0;
 		total_count = 0;
@@ -48,9 +49,26 @@
 		}
     }
 
+	//生成去结算处的url
+	function createurl() {
+		var geturl = '/order/order/?'
+		//获取选中的商品的cart_id
+		$(':checkbox:not(#checkall)').each(function () {
+            if ($(this).prop('checked')) {
+                cart_id = $(this).parents('.cart_list_td').attr('id');
+                geturl = geturl + 'cart_id' + '=' + cart_id + '&'
+            }
+        })
+		geturl = geturl.substring(0, geturl.length - 1)//去掉最后一个&
+		alert(geturl)
+		$('#gotobuy').attr('href', geturl);
+
+	}
+
 	$(function() {
-	    //先计算一次总额
+	    //先计算一次总额,生成去结算处url
 	    total()
+		createurl()
 		//全选全消
 		$('#checkall').click(function () {
 			state = $(this).prop('checked');
@@ -71,6 +89,7 @@
 			        $('#checkall').prop('checked',false);
 				}
 			}
+			createurl()
 			total()
         })
 	    //点击+- 显示相对应的价格和数量,其实不用在这里计算总价直接调用total就行
@@ -116,8 +135,6 @@
 			alert(cart_id)
 			cart_delete(cart_id)
         });
-
-
 
     })
 </script>
@@ -165,6 +182,6 @@
 		<li class="col01"><input type="checkbox" name="" checked="" id="checkall"></li>
 		<li class="col02">全选</li>
 		<li class="col03">合计(不含运费)：<span>¥</span><em id="total">42.60</em><br>共计<b class="total_count1">2</b>件商品</li>
-		<li class="col04"><a href="../df_user/place_order.html">去结算</a></li>
+		<li class="col04" ><a href="/order" id="gotobuy">去结算</a></li>
 	</ul>
 {%endblock%}
