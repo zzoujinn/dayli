@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from models import *
 from django.shortcuts import render,redirect
 from hashlib import sha1
-from django.http import JsonResponse,HttpResponseRedirect
+from django.http import JsonResponse,HttpResponseRedirect,HttpResponse
 import user_decoration
 from df_goods.models import *
 # Create your views here.
@@ -84,9 +84,9 @@ def user_center_info(request):
     print user_address
     goods_ids = request.COOKIES.get('goods_ids','')
     goods_ids1 = goods_ids.split(',')
-    if len(goods_ids1) == 0: # 新账号没有记录,会报错,默认显示前5天.后续改为最新5条
-        goods_ids1==[1,2,3,4,5]
-
+    if goods_ids1 == ['']: # 新账号没有记录,会报错,默认显示前5条.后续改为最新5条
+        print 'aaaaaaa'
+        goods_ids1=[21,22,23,24,25]
     goods_list = []
     print ('goods_ids1---------------->',goods_ids1)
     for goods_id in goods_ids1:
@@ -96,7 +96,10 @@ def user_center_info(request):
              'user_email': user_email,
              'user_address':user_address,
              'user_name': request.session['user_name']}
-    return render(request, 'df_user/user_center_info.html',context)
+    response=render(request, 'df_user/user_center_info.html',context)
+    goods_ids = ','.join(goods_ids1)
+    response.set_cookie('goods_ids',goods_ids)
+    return response
 
 
 @user_decoration.login
